@@ -142,6 +142,11 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
 
 - (UBSignalObserver *)addObserver:(id)observer queue:(nullable NSOperationQueue *)queue callback:(UBSignalCallback)callback
 {
+    return [self addObserver:observer queue:queue priority:UBObserverPriorityNormal callback:callback];
+}
+
+- (UBSignalObserver *)addObserver:(id)observer queue:(nullable NSOperationQueue *)queue priority:(UBObserverPriority)priority callback:(UBSignalCallback)callback
+{
     if (observer == nil) {
         NSAssert(NO, @"Observer cannot be nil");
         return nil;
@@ -153,9 +158,21 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
     }
 
     [self _purgeDeallocedListeners];
-    UBSignalObserver *signalObserver = [[UBSignalObserver alloc] initWithSignal:self observer:observer queue:queue callback:callback];
+    UBSignalObserver *signalObserver = [[UBSignalObserver alloc] initWithSignal:self observer:observer queue:queue callback:callback priority:priority];
     @synchronized(_signalObservers) {
-        [_signalObservers addObject:signalObserver];
+        NSUInteger index = [_signalObservers indexOfObject:signalObserver
+                                             inSortedRange:NSMakeRange(0, _signalObservers.count)
+                                                   options:NSBinarySearchingInsertionIndex
+                                           usingComparator:^NSComparisonResult(UBSignalObserver *lhs, UBSignalObserver *rhs) {
+                                               if (lhs.priority < rhs.priority) {
+                                                   return NSOrderedAscending;
+                                               } else if (lhs.priority > rhs.priority) {
+                                                   return NSOrderedDescending;
+                                               } else {
+                                                   return NSOrderedSame;
+                                               }
+                                           }];
+        [_signalObservers insertObject:signalObserver atIndex:index];
         NSAssert(_signalObservers.count <= _maxObservers, @"Maximum observer count exceeded for this signal");
     }
 

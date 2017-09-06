@@ -36,7 +36,7 @@
 
 #pragma mark - Initializers
 
-- (instancetype)initWithSignal:(UBBaseSignal *)signal observer:(id)observer queue:(NSOperationQueue *)queue callback:(UBSignalCallback)callback
+- (instancetype)initWithSignal:(UBBaseSignal *)signal observer:(id)observer queue:(NSOperationQueue *)queue callback:(UBSignalCallback)callback priority:(UBObserverPriority)priority
 {
     self = [super self];
     if (self) {
@@ -44,6 +44,7 @@
         _observer = observer;
         _callback = callback;
         _operationQueue = queue;
+        _priority = priority;
     }
     return self;
 }
@@ -53,7 +54,7 @@
 
 - (NSString *)debugDescription
 {
-    return [NSString stringWithFormat:@"<%@: %p, observer: %@", NSStringFromClass([self class]), self, self.observer];
+    return [NSString stringWithFormat:@"<%@: %p, %zd, observer: %@", NSStringFromClass([self class]), self, self.priority, self.observer];
 }
 
 

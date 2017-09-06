@@ -26,6 +26,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NSUInteger UBObserverPriority;
+
+static const UBObserverPriority UBObserverPriorityHigh = 1000;
+static const UBObserverPriority UBObserverPriorityNormal = 500;
+static const UBObserverPriority UBObserverPriorityLow = 0;
+
 /**
  A SignalObserver is returned whenever an observer is added to a UBSignal. Use it to cancel this specific observation or change the OperationQueue on which to dispatch the callback on.
  */
@@ -40,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
  If YES, cancels the observer once the signal has fired the next time.
  */
 @property (nonatomic) BOOL cancelsAfterNextFire;
+
+@property (nonatomic, readonly) UBObserverPriority priority;
 
 /**
  Calls the observers callback block with the last data that has been fired by the signal. If no data has been fired by the Signal or the Signal doesn't fire any data, the observers block is not called and NO is returned.
