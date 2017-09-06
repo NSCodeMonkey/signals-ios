@@ -710,6 +710,46 @@
     XCTAssertNil(weakObserver, @"Should have deallocated observer");
 }
 
+- (void)testFireSignalForSpecificPriority
+{
+    UBSignalEmitter *emitter = [[UBSignalEmitter alloc] init];
+ 
+    __block BOOL firstHighSignalFired = NO;
+    __block BOOL secondHighSignalFired = NO;
+    __block BOOL normalSignalFired = NO;
+    __block BOOL lowSignalFired = NO;
+    
+    [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityLow callback:^(id self) {
+        lowSignalFired = YES;
+        XCTAssertTrue(firstHighSignalFired, @"High should have fired before normal");
+        XCTAssertTrue(secondHighSignalFired, @"High should have fired before normal");
+        XCTAssertTrue(normalSignalFired, @"Normal should have fired before low");
+    }];
+    
+    [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityHigh callback:^(id self) {
+        firstHighSignalFired = YES;
+        XCTAssertFalse(normalSignalFired, @"Normal should not have fired before high");
+        XCTAssertFalse(lowSignalFired, @"Low should not have fired before high");
+    }];
+    
+    [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityHigh callback:^(id self) {
+        secondHighSignalFired = YES;
+        XCTAssertFalse(normalSignalFired, @"Normal should not have fired before high");
+        XCTAssertFalse(lowSignalFired, @"Low should not have fired before high");
+    }];
+    
+    [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityNormal callback:^(id self) {
+        normalSignalFired = YES;
+        XCTAssertTrue(firstHighSignalFired, @"High should have fired before normal");
+        XCTAssertTrue(secondHighSignalFired, @"High should have fired before normal");
+        XCTAssertFalse(lowSignalFired, @"Low should not have fired before normal");
+    }];
+    
+    emitter.onEmptySignal.fire();
+    
+    XCTAssertTrue(firstHighSignalFired && secondHighSignalFired && lowSignalFired && normalSignalFired, @"All should have fired");
+}
+
 - (void)testUBSignalHelper
 {
     UBSignal<EmptySignal> *emptySignalWithHelper = [UBSignal emptySignal];

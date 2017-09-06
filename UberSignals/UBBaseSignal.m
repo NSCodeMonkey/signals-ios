@@ -164,9 +164,9 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
                                              inSortedRange:NSMakeRange(0, _signalObservers.count)
                                                    options:NSBinarySearchingInsertionIndex
                                            usingComparator:^NSComparisonResult(UBSignalObserver *lhs, UBSignalObserver *rhs) {
-                                               if (lhs.priority < rhs.priority) {
+                                               if (lhs.priority > rhs.priority) {
                                                    return NSOrderedAscending;
-                                               } else if (lhs.priority > rhs.priority) {
+                                               } else if (lhs.priority < rhs.priority) {
                                                    return NSOrderedDescending;
                                                } else {
                                                    return NSOrderedSame;
