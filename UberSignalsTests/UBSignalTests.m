@@ -710,7 +710,7 @@
     XCTAssertNil(weakObserver, @"Should have deallocated observer");
 }
 
-- (void)testFireSignalForSpecificPriority
+- (void)testFireSignalWithSpecificPriority
 {
     UBSignalEmitter *emitter = [[UBSignalEmitter alloc] init];
  
@@ -721,9 +721,9 @@
     
     [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityLow callback:^(id self) {
         lowSignalFired = YES;
-        XCTAssertTrue(firstHighSignalFired, @"High should have fired before normal");
-        XCTAssertTrue(secondHighSignalFired, @"High should have fired before normal");
-        XCTAssertTrue(normalSignalFired, @"Normal should have fired before low");
+        XCTAssert(firstHighSignalFired, @"High should have fired before normal");
+        XCTAssert(secondHighSignalFired, @"High should have fired before normal");
+        XCTAssert(normalSignalFired, @"Normal should have fired before low");
     }];
     
     [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityHigh callback:^(id self) {
@@ -740,14 +740,73 @@
     
     [emitter.onEmptySignal addObserver:self queue:nil priority:UBObserverPriorityNormal callback:^(id self) {
         normalSignalFired = YES;
-        XCTAssertTrue(firstHighSignalFired, @"High should have fired before normal");
-        XCTAssertTrue(secondHighSignalFired, @"High should have fired before normal");
+        XCTAssert(firstHighSignalFired, @"High should have fired before normal");
+        XCTAssert(secondHighSignalFired, @"High should have fired before normal");
         XCTAssertFalse(lowSignalFired, @"Low should not have fired before normal");
     }];
     
     emitter.onEmptySignal.fire();
     
-    XCTAssertTrue(firstHighSignalFired && secondHighSignalFired && lowSignalFired && normalSignalFired, @"All should have fired");
+    XCTAssert(firstHighSignalFired && secondHighSignalFired && lowSignalFired && normalSignalFired, @"All should have fired");
+}
+
+- (void)testFireSignalOnSerialOperationQueueWithSpecificPriority
+{
+    UBSignalEmitter *emitter = [[UBSignalEmitter alloc] init];
+    
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    queue.maxConcurrentOperationCount = 1;
+    queue.qualityOfService = NSOperationQueuePriorityLow;
+    
+    NSArray *highExceptations = @[[self expectationWithDescription:@"Fire"],
+                                  [self expectationWithDescription:@"Fire"],
+                                  [self expectationWithDescription:@"Fire"],
+                                  [self expectationWithDescription:@"Fire"],
+                                  [self expectationWithDescription:@"Fire"]];
+    NSArray *normalExceptations = @[[self expectationWithDescription:@"Fire"],
+                                    [self expectationWithDescription:@"Fire"],
+                                    [self expectationWithDescription:@"Fire"],
+                                    [self expectationWithDescription:@"Fire"],
+                                    [self expectationWithDescription:@"Fire"]];
+    NSArray *lowExpectations = @[[self expectationWithDescription:@"Fire"],
+                                 [self expectationWithDescription:@"Fire"],
+                                 [self expectationWithDescription:@"Fire"],
+                                 [self expectationWithDescription:@"Fire"],
+                                 [self expectationWithDescription:@"Fire"]];
+    
+    __block NSUInteger highCount = 0, normalCount = 0, lowCount = 0;
+    
+    [emitter.onEmptySignal addObserver:self queue:queue priority:UBObserverPriorityHigh callback:^(id self) {
+        [highExceptations[highCount++] fulfill];
+        
+        XCTAssert(highCount > normalCount);
+        XCTAssert(highCount > lowCount);
+        XCTAssert(normalCount == lowCount);
+    }];
+    
+    [emitter.onEmptySignal addObserver:self queue:queue priority:UBObserverPriorityNormal callback:^(id self) {
+        [normalExceptations[normalCount++] fulfill];
+        
+        XCTAssert(highCount == normalCount);
+        XCTAssert(highCount > lowCount);
+        XCTAssert(normalCount > lowCount);
+    }];
+    
+    [emitter.onEmptySignal addObserver:self queue:queue priority:UBObserverPriorityLow callback:^(id self) {
+        [lowExpectations[lowCount++] fulfill];
+        
+        XCTAssert(highCount == normalCount);
+        XCTAssert(highCount == lowCount);
+        XCTAssert(normalCount == lowCount);
+    }];
+    
+    emitter.onEmptySignal.fire();
+    emitter.onEmptySignal.fire();
+    emitter.onEmptySignal.fire();
+    emitter.onEmptySignal.fire();
+    emitter.onEmptySignal.fire();
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
 - (void)testUBSignalHelper
