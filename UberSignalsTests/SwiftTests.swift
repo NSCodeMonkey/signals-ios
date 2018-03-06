@@ -43,7 +43,7 @@ class SwiftTests: XCTestCase {
         var observed = 0
 
         let signal = UBDictionarySignal()
-        signal.addObserver(self) { (listener) in
+        signal.addObserver(self) { (listener, result) in
             observed += 1
         }
         signal.fire()(Dictionary())

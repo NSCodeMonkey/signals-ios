@@ -218,7 +218,7 @@ CreateSignalInterface(UBMutableDictionarySignal, NSMutableDictionary *mutableDic
 - (UBSignalObserver *)addObserver:(id)observer callback:(void (^)(id self))callback;
 - (UBSignalObserver *)addObserver:(id)observer queue:(nullable NSOperationQueue *)queue callback:(void (^)(id self))callback;
 - (UBSignalObserver *)addObserver:(id)observer queue:(nullable NSOperationQueue *)queue priority:(UBObserverPriority)priority callback:(void (^)(id self))callback;
-- (void (^)())fire;
+- (void (^)(void))fire;
 - (void (^)(UBSignalObserver *signalObserver))fireForSignalObserver;
 - (instancetype)initWithProtocol:(Protocol *)protocol NS_UNAVAILABLE;
 

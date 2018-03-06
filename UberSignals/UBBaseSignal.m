@@ -300,7 +300,7 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
     for (UBSignalObserver *signalObserver in signalObserversCopy) {
         __strong id observer = signalObserver.observer;
 
-        void (^fire)() = ^void() {
+        void (^fire)(void) = ^void() {
             UBSignalCallback callback = signalObserver.callback;
 
             if (signalObserver.cancelsAfterNextFire == YES) {
