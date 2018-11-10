@@ -142,7 +142,12 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
 
 - (UBSignalObserver *)addObserver:(id)observer queue:(nullable NSOperationQueue *)queue callback:(UBSignalCallback)callback
 {
-    return [self addObserver:observer queue:queue priority:UBObserverPriorityNormal callback:callback];
+    return [self addObserver:observer queue:queue priority:UBObserverPriorityDefaultNormal callback:callback];
+}
+
+- (UBSignalObserver *)addObserver:(id)observer priority:(UBObserverPriority)priority callback:(UBSignalCallback)callback
+{
+    return [self addObserver:observer queue:nil priority:priority callback:callback];
 }
 
 - (UBSignalObserver *)addObserver:(id)observer queue:(nullable NSOperationQueue *)queue priority:(UBObserverPriority)priority callback:(UBSignalCallback)callback

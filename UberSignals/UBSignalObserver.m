@@ -25,6 +25,11 @@
 #import "UBSignalObserver+Internal.h"
 #import "UBSignalObserver.h"
 
+const UBObserverPriority UBObserverPriorityDefaultVeryHigh = 1000;
+const UBObserverPriority UBObserverPriorityDefaultHigh = 750;
+const UBObserverPriority UBObserverPriorityDefaultNormal = 500;
+const UBObserverPriority UBObserverPriorityDefaultLow = 250;
+const UBObserverPriority UBObserverPriorityDefaultVeryLow = 0;
 
 @interface UBSignalObserver ()
 

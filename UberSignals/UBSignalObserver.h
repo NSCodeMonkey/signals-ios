@@ -26,11 +26,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSUInteger UBObserverPriority;
+typedef NSUInteger UBObserverPriority NS_TYPED_EXTENSIBLE_ENUM;
 
-static const UBObserverPriority UBObserverPriorityHigh = 1000;
-static const UBObserverPriority UBObserverPriorityNormal = 500;
-static const UBObserverPriority UBObserverPriorityLow = 0;
+FOUNDATION_EXPORT const UBObserverPriority UBObserverPriorityDefaultVeryHigh; // 1000
+FOUNDATION_EXPORT const UBObserverPriority UBObserverPriorityDefaultHigh;     // 750
+FOUNDATION_EXPORT const UBObserverPriority UBObserverPriorityDefaultNormal;   // 500
+FOUNDATION_EXPORT const UBObserverPriority UBObserverPriorityDefaultLow;      // 250
+FOUNDATION_EXPORT const UBObserverPriority UBObserverPriorityDefaultVeryLow;  // 200
 
 /**
  A SignalObserver is returned whenever an observer is added to a UBSignal. Use it to cancel this specific observation or change the OperationQueue on which to dispatch the callback on.
