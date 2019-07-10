@@ -384,27 +384,6 @@
     XCTAssertEqual(fireCount, 2u, @"Signal fire should have been observed three times");
 }
 
-- (void)testCancelsAfterFireWithPreviousData
-{
-    UBSignalEmitter *emitter = [[UBSignalEmitter alloc] init];
-    NSObject *observer1 = [[NSObject alloc] init];
-    emitter.onStringSignal.fire(nil, nil);
-
-    __block NSUInteger fireCount = 0;
-
-    UBSignalObserver *observer = [emitter.onStringSignal addObserver:observer1 callback:^(id observer, NSString *stringData, NSString *otherStringData) {
-        fireCount++;
-    }];
-
-    observer.cancelsAfterNextFire = YES;
-    [observer firePreviousData];
-
-    XCTAssertEqual(fireCount, 1u, @"Signal fire should have been observed one time");
-
-    emitter.onStringSignal.fire(nil, nil);
-    XCTAssertEqual(fireCount, 1u, @"Signal fire should have been observed one time");
-}
-
 - (void)testRetainingOfWeakSelfForDurationOfCallback
 {
     UBSignalEmitter *emitter = [[UBSignalEmitter alloc] init];
@@ -433,37 +412,6 @@
 
     observer = nil;
     emitter.onStringSignal.fire(nil, nil);
-}
-
-- (void)testLateFiringOfSignal
-{
-    UBSignalEmitter *emitter = [[UBSignalEmitter alloc] init];
-
-    __block BOOL fired = NO;
-    __block id callbackSelf = nil;
-    __block NSString *callbackStringData;
-    __block NSString *callbackOtherStringData;
-
-    UBSignalObserver *signalObserver = [emitter.onStringSignal addObserver:self callback:^(typeof(self) self, NSString *stringData, NSString *otherStringData) {}];
-    BOOL didFire = [signalObserver firePreviousData];
-
-    emitter.onStringSignal.fire(@"First", @"Second");
-
-    signalObserver = [emitter.onStringSignal addObserver:self callback:^(typeof(self) self, NSString *stringData, NSString *otherStringData) {
-        fired = YES;
-        callbackSelf = self;
-        callbackStringData = stringData;
-        callbackOtherStringData = otherStringData;
-    }];
-
-    BOOL didFire2 = [signalObserver firePreviousData];
-
-    XCTAssertFalse(didFire, @"firePastData should not report data being fired");
-    XCTAssertTrue(didFire2, @"firePastData should report data being fired");
-    XCTAssert(fired, @"Signal fired");
-    XCTAssertEqual(callbackSelf, self, @"Callback should contain correct self argument");
-    XCTAssertEqual(callbackStringData, @"First", @"Should fire correct string");
-    XCTAssertEqual(callbackOtherStringData, @"Second", @"Should fire correct string");
 }
 
 - (void)testSettingOperationQueueForCallback

@@ -38,7 +38,6 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
 @property (nonatomic, readonly) id fire;
 @property (nonatomic, readonly) id fireForSignalObserver;
 @property (nonatomic, strong) NSMutableArray *signalObservers;
-@property (nonatomic, strong) NSArray *lastData;
 
 @end
 
@@ -239,22 +238,6 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
     }
 }
 
-- (BOOL)firePastDataForSignalObserver:(UBSignalObserver *)signalObserver
-{
-    NSArray *data;
-    @synchronized(_signalObservers) {
-        data = [_lastData copy];
-    }
-
-    if (data) {
-        [self _fireData:data forSignalObservers:@[signalObserver]];
-        return YES;
-    }
-
-    return NO;
-}
-
-
 #pragma mark - Private Interface
 
 - (void)_purgeDeallocedListeners
@@ -281,9 +264,6 @@ typedef void (^UBSignalFire) (id arg1, id arg2, id arg3, id arg4, id arg5);
 
 - (void)_fireNewData:(NSArray *)arguments forSignalObservers:(NSArray *)signalObsevers
 {
-    @synchronized(_signalObservers) {
-        _lastData = arguments;
-    }
     [self _fireData:arguments forSignalObservers:signalObsevers];
 }
 

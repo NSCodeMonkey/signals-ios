@@ -33,7 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UBBaseSignal()
 
 - (void)removeSignalObserver:(UBSignalObserver *)signalObserver;
-- (BOOL)firePastDataForSignalObserver:(UBSignalObserver *)signalObserver;
 
 @end
 

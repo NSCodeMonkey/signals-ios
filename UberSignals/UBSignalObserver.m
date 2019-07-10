@@ -65,11 +65,6 @@ const UBObserverPriority UBObserverPriorityDefaultVeryLow = 0;
 
 #pragma mark - Public Interface
 
-- (BOOL)firePreviousData
-{
-    return [self.signal firePastDataForSignalObserver:self];
-}
-
 - (void)cancel
 {
     [self.signal removeSignalObserver:self];

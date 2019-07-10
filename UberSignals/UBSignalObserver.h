@@ -52,13 +52,6 @@ FOUNDATION_EXPORT const UBObserverPriority UBObserverPriorityDefaultVeryLow;  //
 @property (nonatomic, readonly) UBObserverPriority priority;
 
 /**
- Calls the observers callback block with the last data that has been fired by the signal. If no data has been fired by the Signal or the Signal doesn't fire any data, the observers block is not called and NO is returned.
-
- @return YES if the observer block was called with previous data or NO if the Signal didn't have any previous data.
- */
-- (BOOL)firePreviousData;
-
-/**
  Cancels the observation for this specific observer and callback block.
  */
 - (void)cancel;
